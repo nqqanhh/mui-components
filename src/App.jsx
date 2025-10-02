@@ -82,6 +82,9 @@ import {
   TextareaAutosize,
   Fade,
   useMediaQuery,
+  Grow,
+  Slide,
+  Collapse,
 } from "@mui/material";
 import {
   useTheme,
@@ -100,6 +103,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AlarmIcon from "@mui/icons-material/Alarm";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
+import { TransitionGroup } from "react-transition-group";
+
 export default function AllComponentsDemo() {
   const [snackOpen, setSnackOpen] = React.useState(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -536,7 +541,13 @@ export default function AllComponentsDemo() {
         <PortalDemo />
         <TextareaAutosizeDemo />
         <TransitionsDemo />
+        <SlideRelativeDemo />
+        <SlideDemo />
+        <GrowDemo />
+        <FadeDemo />
+        <TransitionsGroup />
         <UseMediaQueryDemo />
+        {/*  */}
       </Stack>
     </Container>
   );
@@ -669,25 +680,31 @@ export default function AllComponentsDemo() {
 
   function PortalDemo() {
     const [open, setOpen] = React.useState(false);
+
     return (
       <Box>
         <Typography variant='subtitle2'>Portal</Typography>
         <Button onClick={() => setOpen((o) => !o)}>
           {open ? "Unmount" : "Mount"} Portal
         </Button>
-        <Portal disablePortal={!open}>
-          <Paper
-            sx={{
-              p: 1,
-              position: "fixed",
-              bottom: 16,
-              right: 16,
-              zIndex: 1600,
-            }}
-          >
-            Rendered via Portal (ở cuối body)
-          </Paper>
-        </Portal>
+
+        {/* Chỉ mount khi open */}
+        {open && (
+          <Portal /* container mặc định: document.body */>
+            <Paper
+              sx={{
+                p: 1.5,
+                position: "fixed",
+                right: 16,
+                bottom: 16,
+                zIndex: (t) => t.zIndex.modal + 1, // cao hơn modal
+                boxShadow: 6,
+              }}
+            >
+              Rendered via Portal (gắn vào cuối document.body)
+            </Paper>
+          </Portal>
+        )}
       </Box>
     );
   }
@@ -727,7 +744,170 @@ export default function AllComponentsDemo() {
       </Box>
     );
   }
+  function TransitionsGroup() {
+    return (
+      <Box>
+        <Typography variant='h6' gutterBottom>
+          Transitions
+        </Typography>
+        <Stack spacing={2}>
+          <FadeDemo />
+          <GrowDemo />
+          <SlideDemo />
+          <SlideRelativeDemo />
+          <TransitionGroupDemo />
+        </Stack>
+      </Box>
+    );
+  }
 
+  /** Fade */
+  function FadeDemo() {
+    const [open, setOpen] = React.useState(true);
+    return (
+      <Box>
+        <Typography variant='subtitle2'>Fade</Typography>
+        <Button onClick={() => setOpen((o) => !o)}>
+          {open ? "Hide" : "Show"} Fade
+        </Button>
+        <Fade in={open} timeout={300}>
+          <Paper sx={{ p: 1, mt: 1, width: 220, textAlign: "center" }}>
+            Fade content
+          </Paper>
+        </Fade>
+      </Box>
+    );
+  }
+
+  /** Grow */
+  function GrowDemo() {
+    const [open, setOpen] = React.useState(true);
+    return (
+      <Box>
+        <Typography variant='subtitle2'>Grow</Typography>
+        <Button onClick={() => setOpen((o) => !o)}>
+          {open ? "Hide" : "Show"} Grow
+        </Button>
+        <Grow in={open} timeout={300}>
+          <Paper sx={{ p: 1, mt: 1, width: 220, textAlign: "center" }}>
+            Grow content
+          </Paper>
+        </Grow>
+      </Box>
+    );
+  }
+
+  /** Slide (viewport) */
+  function SlideDemo() {
+    const [open, setOpen] = React.useState(true);
+    return (
+      <Box>
+        <Typography variant='subtitle2'>Slide (direction)</Typography>
+        <Button onClick={() => setOpen((o) => !o)}>
+          {open ? "Slide Out" : "Slide In"}
+        </Button>
+        <Box sx={{ height: 8 }} />
+        <Slide in={open} direction='up' mountOnEnter unmountOnExit>
+          <Paper sx={{ p: 1, width: 260, textAlign: "center" }}>
+            Slide from bottom
+          </Paper>
+        </Slide>
+      </Box>
+    );
+  }
+
+  /** Slide Relative (bên trong container riêng, không so với viewport) */
+  function SlideRelativeDemo() {
+    const [open, setOpen] = React.useState(true);
+    const containerRef = React.useRef(null);
+
+    return (
+      <Box>
+        <Typography variant='subtitle2'>Slide (relative container)</Typography>
+        <Button onClick={() => setOpen((o) => !o)}>
+          {open ? "Slide Out" : "Slide In"}
+        </Button>
+
+        <Box
+          ref={containerRef}
+          sx={{
+            mt: 1,
+            position: "relative", // quan trọng: Slide sẽ tính theo container này
+            height: 120,
+            border: "1px dashed",
+            borderColor: "divider",
+            overflow: "hidden",
+          }}
+        >
+          <Slide
+            in={open}
+            direction='right'
+            container={containerRef.current}
+            mountOnEnter
+            unmountOnExit
+          >
+            <Paper sx={{ p: 1, position: "absolute", top: 16, left: 16 }}>
+              Slide inside container
+            </Paper>
+          </Slide>
+        </Box>
+      </Box>
+    );
+  }
+
+  /** Transition Group (thêm/xóa item có hiệu ứng) */
+  function TransitionGroupDemo() {
+    const [items, setItems] = React.useState([
+      { id: 1, text: "Item A" },
+      { id: 2, text: "Item B" },
+    ]);
+    const [counter, setCounter] = React.useState(3);
+
+    const addItem = () => {
+      setItems((prev) => [{ id: counter, text: `Item ${counter}` }, ...prev]);
+      setCounter((c) => c + 1);
+    };
+    const removeItem = (id) =>
+      setItems((prev) => prev.filter((i) => i.id !== id));
+
+    return (
+      <Box>
+        <Typography variant='subtitle2'>Transition Group (Collapse)</Typography>
+        <Stack direction='row' spacing={1} sx={{ mb: 1 }}>
+          <Button variant='outlined' onClick={addItem}>
+            Add item
+          </Button>
+        </Stack>
+
+        <List dense sx={{ width: 320, bgcolor: "background.paper" }}>
+          <TransitionGroup>
+            {items.map((item) => (
+              <Collapse key={item.id}>
+                <ListItem
+                  secondaryAction={
+                    <IconButton
+                      edge='end'
+                      onClick={() => removeItem(item.id)}
+                      aria-label='delete'
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  }
+                >
+                  <ListItemText primary={item.text} />
+                </ListItem>
+              </Collapse>
+            ))}
+          </TransitionGroup>
+        </List>
+
+        <Typography variant='caption' color='text.secondary'>
+          (Dùng <code>TransitionGroup</code> + <code>Collapse</code> để animate
+          thêm/xóa list item)
+        </Typography>
+      </Box>
+    );
+  }
   function UseMediaQueryDemo() {
     const theme = useTheme();
     const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
