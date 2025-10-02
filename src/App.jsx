@@ -98,7 +98,8 @@ import InfoIcon from "@mui/icons-material/Info";
 import SettingsIcon from "@mui/icons-material/Settings";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-
+import AlarmIcon from "@mui/icons-material/Alarm";
+import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 export default function AllComponentsDemo() {
   const [snackOpen, setSnackOpen] = React.useState(false);
   const [dialogOpen, setDialogOpen] = React.useState(false);
@@ -122,12 +123,54 @@ export default function AllComponentsDemo() {
           />
         </Box>
         <Box>
-          <Typography variant='subtitle2'>Button + ButtonGroup</Typography>
-          <ButtonGroup>
-            <Button>One</Button>
-            <Button>Two</Button>
-          </ButtonGroup>
+          <Typography variant='subtitle2'>Button </Typography>
+          <Stack spacing={2} direction='row'>
+            <Button variant='text'>Text</Button>
+            <Button variant='contained'>Contained</Button>
+            <Button variant='outlined'>Outlined</Button>
+            {/*  */}
+            <Button>Primary</Button>
+            <Button disabled>Disabled</Button>
+            <Button href='#text-buttons'>Link</Button>
+            {/*  */}
+          </Stack>
         </Box>
+        <Box></Box>
+        <Box>
+          <Typography variant='subtitle2'>Button + ButtonGroup</Typography>
+          <Stack spacing={2} direction='column'>
+            <ButtonGroup variant='contained'>
+              <Button>One</Button>
+              <Button>Two</Button>
+            </ButtonGroup>
+            <ButtonGroup variant='outlined' aria-label='Basic button group'>
+              <Button>One</Button>
+              <Button>Two</Button>
+              <Button>Three</Button>
+            </ButtonGroup>
+            <ButtonGroup variant='text' aria-label='Basic button group'>
+              <Button>One</Button>
+              <Button>Two</Button>
+              <Button loading>Three</Button>
+            </ButtonGroup>
+          </Stack>
+        </Box>
+        <Box>
+          <Typography variant='subtitle2'>Icon Button</Typography>
+          <IconButton aria-label='delete'>
+            <DeleteIcon />
+          </IconButton>
+          <IconButton aria-label='delete' disabled color='primary'>
+            <DeleteIcon />
+          </IconButton>
+          <IconButton color='secondary' aria-label='add an alarm'>
+            <AlarmIcon />
+          </IconButton>
+          <IconButton color='primary' aria-label='add to shopping cart'>
+            <AddShoppingCartIcon />
+          </IconButton>
+        </Box>
+        <Box></Box>
         <Box>
           <Typography variant='subtitle2'>Checkbox</Typography>
           <Checkbox defaultChecked />
